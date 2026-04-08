@@ -8,6 +8,3 @@ environments:
     templateName: no-op-consumer
     needs:
       - env-a
-    variables:
-      - name: received_value
-        value: ${env0-workflow:env-a:shared_value}
