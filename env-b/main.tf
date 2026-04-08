@@ -8,5 +8,5 @@ variable "received_value" {
 }
 
 output "confirmation" {
-  value = "Environment B received: ${var.received_value}"
+  value = "Environment B received"
 }
