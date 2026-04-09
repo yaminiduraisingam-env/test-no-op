@@ -1,12 +1,31 @@
 environments:
   env-a:
     name: env-a
-    revision: v1
-    templateName: no-op-producer
+    revision: v2
+    templateName: no-op-a
 
   env-b:
     name: env-b
-    revision: v1
-    templateName: no-op-consumer
+    revision: v2
+    templateName: no-op-b
     needs:
       - env-a
+  env-c:
+    name: env-c
+    revision: v2
+    templateName: no-op-c
+    needs:
+      - env-a
+  env-d:
+    name: env-d
+    revision: v2
+    templateName: no-op-d
+    needs:
+      - env-b
+      - env-c
+  env-e:
+    name: env-e
+    revision: v2
+    templateName: no-op-e
+    needs:
+      - env-d
