@@ -1,4 +1,4 @@
 variable "received_value" {
   type        = string
-  description = "Value passed in from env-a"
+  description = "Cluster config received from env-a"
 }
