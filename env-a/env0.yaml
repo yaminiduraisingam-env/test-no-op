@@ -1,42 +1,38 @@
 version: 2
-shell: bash 
+shell: sh
 
 deploy:
   steps:
-    terraformInit:
-      before:
-        - name: Install multiple Python versions in pre-init env0 step
+    setupVariables:
+      after:
+        - name: Install Python versions
           run: |
             set -e
-            apt-get update
-            apt-get install -y \
-              build-essential curl git ca-certificates \
-              libssl-dev zlib1g-dev libbz2-dev \
-              libreadline-dev libsqlite3-dev libffi-dev \
-              libncursesw5-dev xz-utils tk-dev libxml2-dev \
-              libxmlsec1-dev liblzma-dev
-
+            apk add --no-cache curl git build-base linux-headers ca-certificates openssl-dev zlib-dev bzip2-dev readline-dev sqlite-dev xz-dev libffi-dev ncurses-dev tk-dev
             export PYENV_ROOT="$HOME/.pyenv"
-            export PATH="$PYENV_ROOT/bin:$PATH"
-
+            export PATH="$PYENV_ROOT/bin:$PYENV_ROOT/shims:$PATH"
             if [ ! -d "$PYENV_ROOT" ]; then
               git clone https://github.com/pyenv/pyenv.git "$PYENV_ROOT"
             fi
-
             eval "$(pyenv init -)"
-
             pyenv install -s 3.10.14
             pyenv install -s 3.11.9
             pyenv install -s 3.12.3
-
-            pyenv versions
-
-            echo "Using Python 3.11.9 by default"
             pyenv global 3.11.9
+            printf 'PYENV_ROOT=%s\n' "$PYENV_ROOT" >> "$ENV0_ENV"
+            printf 'PATH=%s\n' "$PYENV_ROOT/shims:$PYENV_ROOT/bin:$PATH" >> "$ENV0_ENV"
+            printf 'PYENV_VERSION=%s\n' "3.11.9" >> "$ENV0_ENV"
+
+    terraformInit:
+      before:
+        - name: Verify Python versions
+          run: |
+            set -e
+            export PYENV_ROOT="${PYENV_ROOT:-$HOME/.pyenv}"
+            export PATH="$PYENV_ROOT/shims:$PYENV_ROOT/bin:$PATH"
+            eval "$(pyenv init -)"
+            pyenv versions
             python --version
-
-            echo "Run something with 3.10.14"
             PYENV_VERSION=3.10.14 python --version
-
-            echo "Run something with 3.12.3"
+            PYENV_VERSION=3.11.9 python --version
             PYENV_VERSION=3.12.3 python --version
